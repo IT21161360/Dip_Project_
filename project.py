@@ -2248,11 +2248,9 @@ def rotate_image(degrees):
 
 
 def convert_to_grayscale():
-    global input_image, resized_image
-     # Make sure to define input_image before calling convert_to_grayscale
-    input_image = cv2.imread("C:/Users/Dewmi Silva/Downloads/YellowLabradorLooking_new.jpg")
-    if input_image is not None:
-        resized_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
+    global current_image
+    if current_image is not None:
+        resized_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
         plt.imshow(resized_image)
         plt.axis('off')
         plt.show()
