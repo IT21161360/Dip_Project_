@@ -794,10 +794,10 @@ def open_image_operations_window():
         color_to_grayscale_button = tk.Button(color_conversion_frame, text="Color to Grayscale", command=convert_to_grayscale)
         color_to_grayscale_button.grid(row=1, column=0, padx=5, pady=5)
 
-        bw_to_rgb_button = tk.Button(color_conversion_frame, text="Black & White to RGB", command=bw_to_rgb)
+        bw_to_rgb_button = tk.Button(color_conversion_frame, text="Black & White to GrayScale", command=bw_to_grayScale)
         bw_to_rgb_button.grid(row=1, column=1, padx=5, pady=5)
 
-        grayscale_to_rgb_button = tk.Button(color_conversion_frame, text="Grayscale to RGB", command=grayscale_to_rgb)
+        grayscale_to_rgb_button = tk.Button(color_conversion_frame, text="Grayscale to BlackAndWhite", command=grayscale_to_blackAndWhite)
         grayscale_to_rgb_button.grid(row=1, column=2, padx=5, pady=5)
 
         # Create the main frame for filters
@@ -2246,48 +2246,100 @@ def rotate_image(degrees):
         current_image = current_image.rotate(degrees, expand=True)
         display_image(current_image, zoom_factor)
 
+
+def convert_to_grayscale():
+    global input_image, resized_image
+     # Make sure to define input_image before calling convert_to_grayscale
+    input_image = cv2.imread("C:/Users/Dewmi Silva/Downloads/YellowLabradorLooking_new.jpg")
+    if input_image is not None:
+        resized_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
+        plt.imshow(resized_image)
+        plt.axis('off')
+        plt.show()
+    else:
+        # Handle the case where input_image is not defined
+        print("Input image is not defined.")
+        
 def bw_to_color():
     global current_image
-    if current_image:
-        current_image = current_image.convert("RGB")
-        display_image(current_image, zoom_factor)
+    if current_image is not None:
+        if isinstance(current_image, Image.Image):
+            # Convert the PIL Image to a NumPy array
+            current_image = np.array(current_image)
+        if isinstance(current_image, np.ndarray):
+            # Ensure the image is in grayscale (1 channel)
+            if len(current_image.shape) == 3:
+                current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
+            # Apply a colormap to the grayscale image
+            colored_image = cv2.applyColorMap(current_image, cv2.COLORMAP_JET)
+            # Display the colorized image
+            plt.imshow(cv2.cvtColor(colored_image, cv2.COLOR_BGR2RGB))
+            plt.axis('off')
+            plt.show()
+        else:
+            print("Failed to convert the image to a NumPy array.")
+    else:
+        print("current_image is not defined.")
 
 def color_to_bw():
     global current_image
     if current_image:
         current_image = current_image.convert("L")
-        display_image(current_image, zoom_factor)
+        plt.imshow(current_image, cmap='gray')
+        plt.axis('off')
+        plt.show()
+
 
 def grayscale_to_color():
     global current_image
-    if current_image:
-        current_image = current_image.convert("RGB")
-        display_image(current_image, zoom_factor)
-
-def convert_to_grayscale():
-    global input_image, resized_image
-    if input_image is not None:
-        resized_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
-        display_image(resized_image)
+    if current_image is not None:
+        if isinstance(current_image, str):
+            # If current_image is a file path, read it as grayscale using OpenCV
+            current_image = cv2.imread(current_image, cv2.IMREAD_GRAYSCALE)
+        if isinstance(current_image, np.ndarray):
+            if len(current_image.shape) == 2:
+                # Apply a colormap to the grayscale image
+                colored_image = cv2.applyColorMap(current_image, cv2.COLORMAP_JET)
+                plt.imshow(cv2.cvtColor(colored_image, cv2.COLOR_BGR2RGB))
+                plt.axis('off')
+                plt.show()
+            else:
+                print("The image is not grayscale (1 channel).")
+        else:
+            print("current_image is not a valid NumPy array or file path.")
     else:
-        # Handle the case where input_image is not defined
-        print("Input image is not defined.")
+        print("current_image is not defined.")
 
-# Make sure to define input_image before calling convert_to_grayscale
-input_image = cv2.imread('"C:/Users/Dewmi Silva/Downloads/YellowLabradorLooking_new.jpg"')
+def bw_to_grayScale():
+    global current_image
+    if current_image is not None:
+        if isinstance(current_image, np.ndarray) and len(current_image.shape) == 2:
+            # Ensure the image is grayscale (1 channel) and display it
+            plt.imshow(current_image, cmap='gray')
+            plt.axis('off')
+            plt.show()
+        else:
+            print("current_image is not a valid grayscale NumPy array.")
+    else:
+        print("current_image is not defined.")
+
+def grayscale_to_blackAndWhite():
+    global current_image
+    if current_image:
+        if isinstance(current_image, Image.Image):
+            # Convert the grayscale image to black and white (mode '1')
+            current_image = current_image.convert("1")
+            plt.imshow(current_image, cmap='gray')
+            plt.axis('off')
+            plt.show()
+        else:
+            print("current_image is not a valid Pillow Image object.")
+    else:
+        print("current_image is not defined.")
+# Call the functions as needed
 convert_to_grayscale()
-        
-def bw_to_rgb():
-    global current_image
-    if current_image:
-        current_image = current_image.convert("RGB")
-        display_image(current_image, zoom_factor)
+# Call other functions here as necessary
 
-def grayscale_to_rgb():
-    global current_image
-    if current_image:
-        current_image = current_image.convert("RGB")
-        display_image(current_image, zoom_factor)
 
 # Create the main window
 root = tk.Tk()
